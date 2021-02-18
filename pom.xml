@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.smallrye</groupId>
+		<artifactId>smallrye-parent</artifactId>
+		<version>21</version>
+	</parent>
+
+	<artifactId>smallrye-safer-annotations-parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>SmallRye Safer Annotations Parent</name>
+	<url>https://github.com/smallrye/smallrye-safer-annotations</url>
+	<description>Safer Annotation constraints</description>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/smallrye/smallrye-bom/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:git@github.com:smallrye/smallrye-safer-annotations.git</connection>
+		<developerConnection>scm:git:git@github.com:smallrye/smallrye-safer-annotations.git</developerConnection>
+		<url>git@github.com:smallrye/smallrye-safer-annotations.git</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<properties>
+
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+
+        <maven.javadoc.failOnWarnings>true</maven.javadoc.failOnWarnings>
+    </properties>
+
+	<developers>
+		<developer>
+			<name>Stéphane Épardaud</name>
+			<email>stef@epardaud.fr</email>
+		</developer>
+    </developers>
+
+    <dependencyManagement>
+    </dependencyManagement>
+
+    <modules>
+        <module>core</module>
+    </modules>
+
+    <repositories>
+        <repository>
+            <id>eclipse-snapshots</id>
+            <url>https://repo.eclipse.org/content/repositories/microprofile-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <!-- jnp server -->
+        <repository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Maven Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+  <!-- TODO - to remve once these changes are in the Parent POM -->
+  <build>
+    <plugins>
+      <plugin>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>3.0.0-M3</version>
+          <executions>
+              <execution>
+                  <id>enforce-versions</id>
+                  <goals>
+                      <goal>enforce</goal>
+                  </goals>
+                  <configuration>
+                      <rules>
+                          <requireJavaVersion>
+                              <version>1.8</version>
+                              <message>This project must be built with Java 8 or later.</message>
+                          </requireJavaVersion>
+                      </rules>
+                  </configuration>
+              </execution>
+          </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>${version.release.plugin}</version>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <tagNameFormat>@{project.version}</tagNameFormat>
+          <preparationGoals>verify</preparationGoals>
+          <pushChanges>false</pushChanges>
+          <localCheckout>true</localCheckout>
+          <remoteTagging>false</remoteTagging>
+          <arguments>-DskipTests ${release.arguments}</arguments>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>${version.gpg.plugin}</version>
+        <configuration>
+          <gpgArguments>
+            <arg>--pinentry-mode</arg>
+            <arg>loopback</arg>
+          </gpgArguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>!release.maven.bug.always.be.active</name>
+                </property>
+            </activation>
+            <modules>
+                <module>release</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>
