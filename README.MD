@@ -8,7 +8,7 @@ Import the Safer Annotations module in your `pom.xml`:
 ```xml
 <dependency>
     <groupId>io.smallrye</groupId>
-    <artifactId>safer-annotations</artifactId>
+    <artifactId>smallrye-safer-annotations</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
@@ -49,9 +49,9 @@ Tell your build tool to invoke our compiler plugin:
             <configuration>
                 <annotationProcessorPaths>
                     <annotationProcessorPath>
-                        <groupId>io.quarkus.safer</groupId>
-                        <artifactId>safer-annotations</artifactId>
-                        <version>${quarkus-plugin.version}</version>
+                        <groupId>io.smallrye</groupId>
+                        <artifactId>smallrye-safer-annotations</artifactId>
+                        <version>1.0.0</version>
                     </annotationProcessorPath>
                 </annotationProcessorPaths>
             </configuration>
