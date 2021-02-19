@@ -1,15 +1,15 @@
 Safer Annotations helps you define constraints on your annotations that are richer than the
 stock Java constraints (type, method, field…).
 
-= Usage, for library authors
+# Usage, for library authors
 
 Import the Safer Annotations module in your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>io.quarkus.safer</groupId>
+    <groupId>io.smallrye</groupId>
     <artifactId>safer-annotations</artifactId>
-    <version>${quarkus-plugin.version}</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ class OptionalResponse extends TargetMethod.GenericType<Optional<Response>> {
 }
 ```
 
-= Usage, for your library's users
+# Usage, for your library's users
 
 Tell your build tool to invoke our compiler plugin:
 
@@ -69,7 +69,7 @@ public void myFilter(NonSupportedType something){
 }
 ```
 
-= Supported annotation constraints
+# Supported annotation constraints
 
 - `@TargetAccessor`: annotated method must be a Java Bean getter or setter
 - `@TargetMethod`: annotated method must have a compatible method signature
