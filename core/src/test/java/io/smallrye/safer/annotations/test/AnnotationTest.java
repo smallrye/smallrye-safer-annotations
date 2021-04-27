@@ -79,17 +79,21 @@ public class AnnotationTest {
                 //                System.err.println("new ExpectedError("+error.line+", "+error.column+", \""+error.message+"\"),");
             }
         };
+        // Make sure we do not produce those compilation output in test-classes because we compile on 8 and 12 and don't want to
+        // run tests on a Java 8 runtime seeing classes produced by 12. Besides, we don't need to load those classes.
+        File target = new File("target/test-classes-output");
+        target.mkdirs();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticListener, Locale.ENGLISH,
                 StandardCharsets.UTF_8);
         fileManager.setLocation(StandardLocation.SOURCE_PATH, Arrays.asList(new File("src/test/java")));
-        fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File("target/test-classes")));
+        fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(target));
 
         List<JavaFileObject> files = new ArrayList<>();
         for (Class<?> klass : classes) {
             files.add(fileManager.getJavaFileForInput(StandardLocation.SOURCE_PATH, klass.getName(), Kind.SOURCE));
         }
         CompilationTask task = compiler.getTask(null, fileManager, diagnosticListener,
-                Arrays.asList("-sourcepath", "src/test/java", "-d", "target/test-classes"),
+                Arrays.asList("-sourcepath", "src/test/java", "-d", target.getPath()),
                 null, files);
         task.setProcessors(Arrays.asList(new SaferAnnotationProcessor()));
         if (errors.isEmpty()) {
