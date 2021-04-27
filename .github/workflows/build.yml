@@ -21,19 +21,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: build with JDK 12
+    name: build using Maven
 
     steps:
       - uses: actions/checkout@v2
         name: checkout
 
-      - uses: actions/setup-java@v1.4.3
-        name: set up JDK 8
+      - uses: AdoptOpenJDK/install-jdk@v1
+        name: Set up JDK 12
         with:
-          java-version: 8
+          version: 12
 
-      - name: build with maven
-        run: JAVA_HOME=$JAVA_HOME_8_X64 mvn -B formatter:validate verify --file pom.xml javadoc:javadoc
+      - uses: AdoptOpenJDK/install-jdk@v1
+        name: Set up JDK 8
+        with:
+          version: 8
+          targets: 'JAVA_HOME_8'
+
+      - name: Build
+        run: mvn -B formatter:validate verify --file pom.xml -Djava8.home=$JAVA_HOME_8 javadoc:javadoc
 
   quality:
     needs: [build]
