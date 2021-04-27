@@ -17,6 +17,7 @@ public @interface TargetMethod {
      * Indicates the allowed method return types.
      * 
      * @see GenericType How tospecify generic types
+     * @return the allowed method return types
      */
     Class<?>[] returnTypes() default {};
 
@@ -24,6 +25,7 @@ public @interface TargetMethod {
      * Indicates the allowed method parameter types.
      * 
      * @see GenericType How to specify generic types
+     * @return the allowed method parameter types
      */
     Class<?>[] parameterTypes() default {};
 
@@ -31,7 +33,7 @@ public @interface TargetMethod {
      * Use named subclasses of this type to pass generic types to {@link TargetMethod}:
      * 
      * <pre>
-     * class UniResponse extends TargetMethod.GenericType&lt;Uni&lt;Response>>{}
+     * class UniResponse extends TargetMethod.GenericType&lt;Uni&lt;Response&gt;&gt;{}
      * 
      * &#64;TargetMethod(returnTypes = UniResponse.class)
      * &#64;Target(ElementType.METHOD)
