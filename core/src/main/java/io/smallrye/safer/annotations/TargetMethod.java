@@ -46,7 +46,7 @@ public @interface TargetMethod {
     }
 
     /**
-     * Use named subclasses of this type to express that a parameter can be any subtype of the given type <tt>T</tt>:
+     * Use named subclasses of this type to express that a parameter can be any subtype of the given type <code>T</code>:
      * 
      * <pre>
      * class ThrowableSubtype extends TargetMethod.Subtype&lt;Throwable&gt;{}
