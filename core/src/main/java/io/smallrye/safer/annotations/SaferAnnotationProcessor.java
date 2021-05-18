@@ -2,14 +2,19 @@ package io.smallrye.safer.annotations;
 
 import static javax.lang.model.util.ElementFilter.methodsIn;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -29,6 +34,8 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic.Kind;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
 
 public class SaferAnnotationProcessor extends AbstractProcessor {
 
@@ -115,9 +122,54 @@ public class SaferAnnotationProcessor extends AbstractProcessor {
          * comes from external libs.
          * In short: you can try to improve this, but good luck.
          */
-        for (DefinitionOverride override : ServiceLoader.load(DefinitionOverride.class,
-                SaferAnnotationProcessor.class.getClassLoader())) {
-            loadOverrideClass(override.getClass().getName());
+        // First try to load it via the filer, because this works in some cases where the ServiceLoader doesn't, even though
+        // there can be only a single file, but in case your overrides are in your current project, they won't be compiled yet
+        // so you can only load them via the Javac Mirror API, and not the ServiceLoader, which requires them to be compiled.
+        try {
+            FileObject resource = this.processingEnv.getFiler().getResource(StandardLocation.CLASS_PATH, "",
+                    "META-INF/services/" + DefinitionOverride.class.getName());
+            try (BufferedReader reader = new BufferedReader(resource.openReader(true))) {
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    String className = line.trim();
+                    loadOverrideClass(className);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            // ignore this one, it's fine if it doesn't exist
+        } catch (IOException e) {
+            // Shrug
+            e.printStackTrace();
+        }
+        // Now do the real thing in most cases.
+        Iterator<DefinitionOverride> services = ServiceLoader.load(DefinitionOverride.class,
+                SaferAnnotationProcessor.class.getClassLoader()).iterator();
+        while (services.hasNext()) {
+            // This is how we get around missing classes per entry, since there's no API to get us the class names
+            // rather than instances
+            try {
+                DefinitionOverride override = services.next();
+                loadOverrideClass(override.getClass().getName());
+            } catch (ServiceConfigurationError x) {
+                // I kid you not, there's no accessor for the service type
+                // format: io.smallrye.safer.annotations.DefinitionOverride: Provider io.quarkus.resteasy.reactive.server.runtime.ServerExceptionMapperOverride not found
+                String message = x.getMessage();
+                String prefix = DefinitionOverride.class.getName() + ": Provider ";
+                String suffix = " not found";
+                // Ignore those we already loaded above, and NOTE the others: let's not break the build for this
+                if (message.startsWith(prefix) && message.endsWith(suffix)) {
+                    String className = message.substring(prefix.length(), message.length() - suffix.length());
+                    if (loadedOverrides.contains(className)) {
+                        // ignore it
+                    } else {
+                        // ignore it and move on to the next one
+                        processingEnv.getMessager().printMessage(Kind.NOTE, "Failed to load service provider: " + className);
+                    }
+                } else {
+                    // ignore it and move on to the next one
+                    processingEnv.getMessager().printMessage(Kind.NOTE, "Failed to load service provider: " + x.getMessage());
+                }
+            }
         }
     }
 
