@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Target must be a getter or setter
+ * Target must be a getter or setter. If you cannot directly annotate your annotation, use {@link DefinitionOverride}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

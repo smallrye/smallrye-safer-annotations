@@ -42,4 +42,9 @@ public class Invalid {
     @MethodAnnotation
     public void method3(List<Integer> ls, String s) {
     }
+
+    // this is supposed to be its standard definition, but it should be overridden
+    @OverriddenMethodAnnotation
+    public void method4(Integer s) {
+    }
 }
