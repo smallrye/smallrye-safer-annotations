@@ -14,7 +14,7 @@ package io.smallrye.safer.annotations;
  * </pre>
  * 
  * Do not forget to list your implementations in a service file in
- * <tt>META-INF/services/io.smallrye.safer.annotations.DefinitionOverride</tt>.
+ * <code>META-INF/services/io.smallrye.safer.annotations.DefinitionOverride</code>.
  */
 public interface DefinitionOverride {
 
