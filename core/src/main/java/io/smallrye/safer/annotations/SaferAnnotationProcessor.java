@@ -126,7 +126,7 @@ public class SaferAnnotationProcessor extends AbstractProcessor {
         // there can be only a single file, but in case your overrides are in your current project, they won't be compiled yet
         // so you can only load them via the Javac Mirror API, and not the ServiceLoader, which requires them to be compiled.
         try {
-            FileObject resource = this.processingEnv.getFiler().getResource(StandardLocation.CLASS_PATH, "",
+            FileObject resource = this.processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "",
                     "META-INF/services/" + DefinitionOverride.class.getName());
             try (BufferedReader reader = new BufferedReader(resource.openReader(true))) {
                 String line = null;
@@ -137,7 +137,7 @@ public class SaferAnnotationProcessor extends AbstractProcessor {
             }
         } catch (FileNotFoundException e) {
             // ignore this one, it's fine if it doesn't exist
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             // Shrug
             e.printStackTrace();
         }
